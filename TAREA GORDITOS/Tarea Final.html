@@ -1,0 +1,245 @@
+<!-- /index.html (ACTUALIZADO) -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pizza Gorditos — Delivery</title>
+  <meta name="description" content="Ordena pizza a domicilio en Pizza Gorditos: rápido, claro y seguro." />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="container header-row">
+      <button id="menu-toggle" class="icon-btn mobile-only" aria-label="Abrir menú" aria-expanded="false">☰</button>
+
+      <div class="brand">
+        <img id="brand-logo" class="brand-img" src="logos.png" alt="Logo Pizza Gorditos" />
+        <div class="logo" aria-hidden="true"></div>
+        <div class="brand-text">
+          <strong>Pizza Gorditos</strong>
+          <span>Delivery</span>
+        </div>
+      </div>
+
+      <button id="open-cart" class="icon-btn" aria-label="Abrir carrito">🛒</button>
+    </div>
+  </div>
+
+  <!-- MENUBAR (desktop) -->
+  <nav class="menubar" aria-label="Navegación principal">
+    <div class="container menubar-inner">
+      <a href="#hero">Inicio</a>
+      <a href="#menu">Menú</a>
+      <a href="#promos">Promociones</a>
+      <a href="#contacto">Contacto</a>
+    </div>
+  </nav>
+
+  <!-- Backdrop + Menú móvil -->
+  <div id="menu-backdrop" class="menu-backdrop" hidden></div>
+  <div id="mobile-menu" class="mobile-menu" hidden>
+    <a href="#hero" class="mobile-link">Inicio</a>
+    <a href="#menu" class="mobile-link">Menú</a>
+    <a href="#promos" class="mobile-link">Promociones</a>
+    <a href="#contacto" class="mobile-link">Contacto</a>
+  </div>
+
+  <!-- HERO -->
+  <header id="hero" class="hero hero-fixed-bg" role="img" aria-label="Pizza recién horneada">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <h1>It’s Not Just A Pizza, It’s <span class="accent">An Experience</span></h1>
+        <p>Ordena online con nuestra cocina abierta y entrega rápida.</p>
+        <div class="hero-cta">
+          <a class="btn primary" href="#menu">Ordenar ahora</a>
+          <div class="kpis">
+            <span>2000+ Clientes</span>
+            <span>150+ Entregas/día</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- MENÚ -->
+    <section id="menu" class="section container">
+      <div class="section-head">
+        <h2>Descubre Nuestro Menú</h2>
+        <div class="chips">
+          <button class="chip active" disabled>Pizzas</button>
+          <button class="chip">Promociones</button>
+        </div>
+      </div>
+      <div id="menu-grid" class="menu-grid" aria-live="polite"></div>
+    </section>
+
+    <!-- CHECKOUT -->
+    <section id="checkout" class="section container">
+      <h2>Checkout</h2>
+      <div class="checkout-layout">
+        <aside class="cart" aria-label="Carrito">
+          <header class="cart-head">
+            <strong>Carrito</strong>
+            <button id="clear-cart" class="text-btn">Vaciar</button>
+          </header>
+          <div id="cart-list" class="cart-list"></div>
+          <div id="cart-empty" class="cart-empty">Tu carrito está vacío</div>
+          <div class="totals">
+            <div class="row"><span>Subtotal</span><strong id="subtotal">$0.00</strong></div>
+            <div class="row"><span>Descuento</span><strong id="discount">$0.00</strong></div>
+            <div class="row"><span>Envío</span><strong id="shipping">$2.00</strong></div>
+            <div class="row total"><span>Total</span><strong id="total">$0.00</strong></div>
+          </div>
+        </aside>
+
+        <form id="order-form" class="form" novalidate>
+          <div class="field">
+            <label for="name">Nombre</label>
+            <input id="name" name="name" required placeholder="Juan Pérez" />
+          </div>
+          <div class="field">
+            <label for="phone">Teléfono</label>
+            <!-- Máx 8 dígitos con guion auto: ####-#### -->
+            <input id="phone" name="phone" type="tel"
+                   inputmode="numeric" maxlength="9"
+                   placeholder="1234-5678"
+                   pattern="^\d{4}-\d{4}$" required />
+          </div>
+          <div class="field">
+            <label for="address">Dirección</label>
+            <input id="address" name="address" required placeholder="Colonia, calle, # casa" />
+          </div>
+          <div class="field">
+            <label for="payment">Método de pago</label>
+            <select id="payment" name="payment">
+              <option value="contraentrega">Contraentrega</option>
+              <option value="online">En línea (10% off)</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn primary">Confirmar pedido</button>
+            <p id="form-status" class="form-status" aria-live="polite"></p>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ESTADO + MAPA -->
+    <section id="estado" class="section container">
+      <h2>Estado del envío</h2>
+      <div id="status-card" class="status-card">
+        <div id="no-order">Aún no hay pedidos. Agrega pizzas y confirma.</div>
+        <div id="order-info" class="hide">
+          <div class="order-head">
+            <div>
+              <div class="order-id" id="order-id">—</div>
+              <p id="order-summary"></p>
+            </div>
+            <button id="advance" class="btn">Simular avance</button>
+          </div>
+          <div class="timeline">
+            <div class="step" data-step="0">Recibido</div>
+            <div class="step" data-step="1">Preparando</div>
+            <div class="step" data-step="2">En camino</div>
+            <div class="step" data-step="3">Entregado</div>
+          </div>
+          <div id="map" class="map" role="img" aria-label="Mapa de entrega"></div>
+          <p class="muted" id="eta-text"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROMOCIONES -->
+    <section id="promos" class="section container">
+      <h2>Promociones</h2>
+      <div class="promo-grid">
+        <article class="promo-card">
+          <h3>🔥 2x1 Martes</h3>
+          <p>Llévate 2 pizzas medianas por el precio de 1. Aplica Margarita y Pepperoni.</p>
+          <small>Válido solo los martes. No acumulable.</small>
+        </article>
+        <article class="promo-card">
+          <h3>🍕 Familiar + Pepperoni pequeña</h3>
+          <p>Por cada <strong>2 pizzas familiares</strong> (cualquier especialidad) te regalamos <strong>1 Pepperoni personal</strong>. Se agrega automáticamente en el carrito.</p>
+          <small>Válido toda la semana.</small>
+        </article>
+      </div>
+    </section>
+
+    <!-- CONTACTO -->
+    <section id="contacto" class="section container">
+      <h2>Contacto</h2>
+      <p class="muted">Sucursal central · Tel: <a href="tel:+50378220923">+503 7822 0923</a></p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">© <span id="year"></span> Pizza Gorditos — Proyecto académico.</div>
+  </footer>
+
+  <!-- Modal "procesando" -->
+  <dialog id="pay-modal">
+    <div class="modal">
+      <div class="spinner" aria-hidden="true"></div>
+      <p id="pay-text">Procesando pago…</p>
+    </div>
+  </dialog>
+
+  <!-- Pantalla de pago en línea -->
+  <dialog id="pay-sheet">
+    <form id="pay-form" method="dialog" class="pay-sheet" novalidate>
+      <header class="pay-head">
+        <strong>Pago en línea</strong>
+        <button type="button" id="pay-close" class="icon-btn">✕</button>
+      </header>
+      <div class="pay-body">
+        <div class="field">
+          <label for="cardName">Nombre en la tarjeta</label>
+          <input id="cardName" autocomplete="cc-name" required placeholder="Como aparece en la tarjeta" />
+        </div>
+        <div class="field">
+          <label for="cardNumber">Número de tarjeta</label>
+          <input id="cardNumber" inputmode="numeric" autocomplete="cc-number"
+                 maxlength="19" placeholder="1234 5678 9012 3456"
+                 pattern="^(\d{4} ?){3}\d{4}$" required />
+        </div>
+        <div class="pay-row">
+          <div class="field">
+            <label for="exp">Vencimiento</label>
+            <input id="exp" inputmode="numeric" autocomplete="cc-exp"
+                   maxlength="5" placeholder="MM/AA"
+                   pattern="^(0[1-9]|1[0-2])\/\d{2}$" required />
+          </div>
+          <div class="field">
+            <label for="cvv">CVV</label>
+            <input id="cvv" inputmode="numeric" autocomplete="cc-csc"
+                   maxlength="4" placeholder="123" pattern="^\d{3,4}$" required />
+          </div>
+        </div>
+        <div class="field">
+          <label for="method">Método</label>
+          <select id="method" autocomplete="cc-type">
+            <option>Visa</option>
+            <option>MasterCard</option>
+            <option>American Express</option>
+            <option>PayPal</option>
+          </select>
+        </div>
+      </div>
+      <footer class="pay-foot">
+        <button class="btn" type="button" id="pay-cancel">Cancelar</button>
+        <button class="btn primary" type="submit" id="pay-submit">Pagar ahora</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
