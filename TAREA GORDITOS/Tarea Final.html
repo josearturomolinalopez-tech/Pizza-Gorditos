@@ -35,6 +35,7 @@
     <div class="container menubar-inner">
       <a href="#hero">Inicio</a>
       <a href="#menu">Menú</a>
+      <a href="#servicios">Servicios</a>
       <a href="#promos">Promociones</a>
       <a href="#contacto">Contacto</a>
     </div>
@@ -45,6 +46,7 @@
   <div id="mobile-menu" class="mobile-menu" hidden>
     <a href="#hero" class="mobile-link">Inicio</a>
     <a href="#menu" class="mobile-link">Menú</a>
+    <a href="#servicios" class="mobile-link">Servicios</a>
     <a href="#promos" class="mobile-link">Promociones</a>
     <a href="#contacto" class="mobile-link">Contacto</a>
   </div>
@@ -77,6 +79,56 @@
         </div>
       </div>
       <div id="menu-grid" class="menu-grid" aria-live="polite"></div>
+    </section>
+
+    <!-- CALCULADORA DE SERVICIOS -->
+    <section id="servicios" class="section container">
+      <h2>Calculadora de precios de servicios</h2>
+      <div class="service-calc">
+        <form id="service-form" class="form" novalidate>
+          <div class="field">
+            <label for="service-name">Servicio</label>
+            <input id="service-name" placeholder="Ej: Instalación de red" />
+          </div>
+          <div class="field">
+            <label for="service-rate">Tarifa por hora (USD)</label>
+            <input id="service-rate" type="number" min="0" step="0.01" value="25" required />
+          </div>
+          <div class="field">
+            <label for="service-hours">Horas estimadas</label>
+            <input id="service-hours" type="number" min="0" step="0.5" value="2" required />
+          </div>
+          <div class="field">
+            <label for="service-materials">Materiales/insumos (USD)</label>
+            <input id="service-materials" type="number" min="0" step="0.01" value="0" required />
+          </div>
+          <div class="field">
+            <label for="service-urgency">Recargo por urgencia (%)</label>
+            <input id="service-urgency" type="number" min="0" max="100" step="1" value="0" required />
+          </div>
+          <div class="field">
+            <label for="service-discount">Descuento (%)</label>
+            <input id="service-discount" type="number" min="0" max="100" step="1" value="0" required />
+          </div>
+          <div class="field">
+            <label for="service-tax">Impuesto (%)</label>
+            <input id="service-tax" type="number" min="0" max="100" step="0.1" value="13" required />
+          </div>
+        </form>
+
+        <aside class="service-summary" aria-live="polite">
+          <h3 id="service-title">Resumen del servicio</h3>
+          <div class="totals">
+            <div class="row"><span>Mano de obra</span><strong id="service-labor">$0.00</strong></div>
+            <div class="row"><span>Materiales</span><strong id="service-materials-total">$0.00</strong></div>
+            <div class="row"><span>Recargo urgencia</span><strong id="service-urgency-total">$0.00</strong></div>
+            <div class="row"><span>Descuento</span><strong id="service-discount-total">$0.00</strong></div>
+            <div class="row"><span>Subtotal</span><strong id="service-subtotal">$0.00</strong></div>
+            <div class="row"><span>Impuesto</span><strong id="service-tax-total">$0.00</strong></div>
+            <div class="row total"><span>Total estimado</span><strong id="service-total">$0.00</strong></div>
+          </div>
+        </aside>
+      </div>
     </section>
 
     <!-- CHECKOUT -->
