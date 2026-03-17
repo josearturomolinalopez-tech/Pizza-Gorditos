@@ -259,6 +259,50 @@ function getCourierPos(){ return load(COURIER_KEY, null); }
 function setCourierPos(latlng){ save(COURIER_KEY, latlng); }
 function clearCourierPos(){ del(COURIER_KEY); }
 
+/* ===== Calculadora de servicios ===== */
+function serviceNumber(id){
+  const el = document.getElementById(id);
+  const n = Number(el?.value);
+  return Number.isFinite(n) ? Math.max(0, n) : 0;
+}
+function renderServiceCalculator(){
+  const title = (document.getElementById('service-name')?.value || '').trim();
+  const rate = serviceNumber('service-rate');
+  const hours = serviceNumber('service-hours');
+  const materials = serviceNumber('service-materials');
+  const urgencyPct = Math.min(100, serviceNumber('service-urgency')) / 100;
+  const discountPct = Math.min(100, serviceNumber('service-discount')) / 100;
+  const taxPct = Math.min(100, serviceNumber('service-tax')) / 100;
+
+  const labor = rate * hours;
+  const base = labor + materials;
+  const urgencyTotal = base * urgencyPct;
+  const preDiscount = base + urgencyTotal;
+  const discountTotal = preDiscount * discountPct;
+  const subtotal = preDiscount - discountTotal;
+  const taxTotal = subtotal * taxPct;
+  const total = subtotal + taxTotal;
+
+  const titleEl = document.getElementById('service-title');
+  if(titleEl){
+    titleEl.textContent = title ? `Resumen: ${title}` : 'Resumen del servicio';
+  }
+  const set = (id, value)=>{ const el = document.getElementById(id); if(el) el.textContent = money(value); };
+  set('service-labor', labor);
+  set('service-materials-total', materials);
+  set('service-urgency-total', urgencyTotal);
+  set('service-discount-total', -discountTotal);
+  set('service-subtotal', subtotal);
+  set('service-tax-total', taxTotal);
+  set('service-total', total);
+}
+function setupServiceCalculator(){
+  const form = document.getElementById('service-form');
+  if(!form) return;
+  form.querySelectorAll('input').forEach(input=> input.addEventListener('input', renderServiceCalculator));
+  renderServiceCalculator();
+}
+
 function renderStatus(){
   const no=$('#no-order'), info=$('#order-info');
   if(!state.lastOrder){ no.classList.remove('hide'); info.classList.add('hide'); return; }
@@ -343,6 +387,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   }
 
   renderMenu(); renderCart(); renderStatus();
+  setupServiceCalculator();
   $('#payment').addEventListener('change', renderCart);
   $('#open-cart').addEventListener('click', ()=>{ location.hash='#checkout'; });
   $('#clear-cart').addEventListener('click', clearCart);
